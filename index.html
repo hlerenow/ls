@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>HL</title>
+	<script src="/js/socket.io.js"></script>
+	</head>
+	<body>
+		hello
+	</body>
+	<!-- // <script src="/socket.io/socket.io.js"></script> -->
+	<script>
+	window.onload=function(){
+		  var socket = io.connect('http://localhost');
+		  socket.on('ok', function (data) {
+		    console.log(data.id);
+		    console.log("w");
+		    socket.emit('my other event', { my: 'data' });
+		  });
+		
+	}
+	</script>
+</html>

@@ -1,0 +1,8 @@
+{
+  "connectionLimit" : 10,
+  "host"            : "localhost",
+  "user"            : "root",
+  "password"        : "595806119",
+  "database" : "ls",
+  "multipleStatements": true
+}

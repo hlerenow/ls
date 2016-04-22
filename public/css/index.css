@@ -1,0 +1,19 @@
+body{
+	font-family: "Microsoft Yahei";
+}
+.index-chooice{
+	padding: 10px;
+}
+
+.index-chooice > button{
+    border-radius: 3px;
+    padding: 5px;
+    background-color: #3BA73C;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+
+#login-fomrs div{
+	display: none;
+}

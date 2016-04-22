@@ -1,0 +1,78 @@
+html,body{
+	width: 100%;
+	height: 100%;
+}
+
+.chatWindow{
+	width: 100%;
+	height: 100%;
+	background: #E5E9EB;
+}
+
+.showContent{
+	width: 100%;
+	height: 70%;
+	min-height: 300px;
+	background-color: pink;
+	box-sizing:border-box;
+	padding: 10px;
+}
+
+.container{
+	width: 100%;
+	height: 100%;
+	background-color: white;
+	overflow: auto;
+}
+.showContent ul{
+	background-color: white;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	width: 100%;
+	min-height: 100%;
+
+}
+
+.aWord{
+	margin-bottom: 10px;
+}
+
+
+
+.inputWord{
+	box-sizing:border-box;
+	width: 100%;
+	height: 20%;
+	min-height: 100px;
+	background-color: pink;
+	padding:  10px 10px 15px 10px;
+}
+
+.inputWord #word{
+	width: 100%;
+	height: 100%;
+	max-width: 100%;
+	max-height: 100%;
+	resize:none;
+}
+
+.endBar{
+	width: 100%;
+	height: 10%;
+	background-color: green;
+	min-height: 30px;
+}
+
+#sendNews{
+	cursor: pointer;
+    color: white;
+    border: none;
+    float: right;
+    background-color: #05444D;
+    width: 100px;
+    padding: 5px;
+    border-radius: 5px;
+    margin-top: 30px;
+    margin-right: 10px;
+}

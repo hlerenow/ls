@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>客服系统</title>
+	<link rel="stylesheet" type="text/css" href="/css/normalize.css"></head>
+	<link rel="stylesheet" href="/css/index.css">
+<body>
+	<div class="index-chooice">
+		<button id="crypto">匿名咨询</button>
+		<button id="loginBtn">登录咨询</button>
+	</div>
+	<div id="login-fomrs">
+		<div id="crytonym">
+			<form action="/process/visitorLogin" method="post">
+				<span>昵称<input type="text" name="nickname" /></span>
+				<span>电子邮箱<input type="text" name="email" /></span>
+				<input type="submit" value="咨询" />
+
+
+			</form>
+		</div>
+		<div id="login">
+			<form action="/process/login" method="post">
+				<input type="text" name="username">
+				<input type="password" name="password">
+				<input type="submit" value="登录">
+			</form>
+		</div>
+	</div>
+</body>
+<script type="text/javascript">
+	window.onload=function(){
+		function hbind(dom,event,fn){
+			if(dom.addEventListener){
+				dom.addEventListener(event,fn);
+			}
+			else{
+				dom.attachEvent("on"+event,fn);
+			};
+		};
+
+
+		function hGetStyle(dom,attr){
+			if(window.getComputedStyle){
+				return window.getComputedStyle(dom,null)[attr];
+			}
+			else if(dom.currentStyle){
+				return dom.currentStyle[attr];
+			}else return null;
+		};
+
+		hbind(document.getElementById("crypto"),"click",function(){
+			document.getElementById("login").style.display="none";			
+			var nowDisoplay=hGetStyle(document.getElementById("crytonym"),"display");
+			if(nowDisoplay=="none"){
+
+				document.getElementById("crytonym").style.display="block";
+			}else{
+				document.getElementById("crytonym").style.display="none";				
+			}
+		});
+
+		hbind(document.getElementById("loginBtn"),"click",function(){
+			document.getElementById("crytonym").style.display="none";	
+
+			var nowDisoplay=hGetStyle(document.getElementById("login"),"display");
+			if(nowDisoplay=="none"){
+
+				document.getElementById("login").style.display="block";
+			}else{
+				document.getElementById("login").style.display="none";				
+			}
+		});		
+
+	}
+	
+</script>
+</html>

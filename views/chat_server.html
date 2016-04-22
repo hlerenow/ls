@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>客服管理</title>
+	<link rel="stylesheet" type="text/css" href="/css/normalize.css"/>
+	<link rel="stylesheet" type="text/css" href="/css/chatServer.css"/>
+	<script src="/js/jquery-1.8.0.min.js"></script>
+	</head>
+	<body>
+		<div id="usersListCon">
+			<ul id="userList">
+				<li id="titleList">
+					<h3>用户列表</h3>		
+				</li>
+				
+			</ul>						
+		</div>
+		<div class="chatWindow">
+			<div class="userNews">
+				正在与<span id="nowUsername" uId="">自己</span>对话
+			</div>
+			<div class="showContent ">
+				<div class="container">
+					<ul>									
+					</ul>
+				</div>				
+			</div>
+			<div class="inputWord">
+				<textarea id="word"></textarea>
+			</div>
+			<div class="endBar">
+				<button id="sendNews">发送</button>
+			</div>
+		</div>
+	
+	</body>
+	<!-- // <script src="/socket.io/socket.io.js"></script> -->
+	<script src="/js/socket.io.js"></script>
+	<script type="text/javascript">
+
+window.onload=function() {	
+		console.log("run");
+
+		var chatNews={};
+
+		//一个用户对象
+		var hPerson=function(){
+			this.username="hl";//用户名
+			this.chatHtmlText="";//用户当前聊天记录
+			this.unReadChatId=[];//当前聊天记录id列表
+			this.count=this.unReadChatId.length;//未读消息数
+			this.nickname="匿名用户";//用户昵称
+
+		};
+
+		//一群用户对象
+		var hPerosonList=function(){
+			this._hPerosonList=[];
+		};
+		//添加用户
+		hPerosonList.prototype.push=function(obj){
+			this._hPerosonList.push(obj);
+
+		};
+		//删除用户
+		hPerosonList.prototype.cut=function(nameStr){//更具用户的用户名删除用户数据结构
+			for(var i in this._hPerosonList){
+				if( this._hPerosonList[i].username&&this._hPerosonList[i].username=="nameStr"){
+						var temp=this._hPerosonList[i];
+						delete this._hPerosonList[i];
+						return temp;
+				}
+			}
+		};
+		//搜索用户
+		hPerosonList.prototype.search=function(nameStr){
+			console.log("serach",this._hPerosonList.length);
+			if(this._hPerosonList.length){
+
+				for(var i in this._hPerosonList){
+
+					console.log("比较",this._hPerosonList[i].username,nameStr);
+					if( this._hPerosonList[i].username&&this._hPerosonList[i].username==nameStr){
+
+							return i;
+					}
+					else{
+						return -1;
+					}
+				}			
+			}else{
+				return -1;
+			}
+		};
+		//用户个数
+		hPerosonList.prototype.len=function(){
+			var count=this._hPerosonList[i].length;
+			if(count){
+				count=0;
+				for(var i in this._hPerosonList){
+					if(this._hPerosonList[i]!=undefined){
+						count++;
+					}
+				};				
+			}
+			return count;
+		};
+		//获取单个用户
+		hPerosonList.prototype.get=function(index){
+			return this._hPerosonList[index];
+		};
+
+
+
+		var myId="<%=userName%>";
+
+		 var socket = io.connect('http://115.159.197.251:3000');
+		//var socket = io.connect('http://localhost:3000');
+
+
+		var chatUserList=new hPerosonList();
+
+		socket.emit("check_user",{username:myId});
+
+		//验证用户
+		socket.on("connect-server", function(data) {
+			console.log("验证成功");
+		});		
+
+
+		//发送消息
+		$("#sendNews").on("click", function() {
+			console.log("消息发送");
+			var content = $("#word").val();
+			var toId=$("#nowUsername").attr("uid");
+			$("#word").val("");
+
+			chatUserList.search(toId).chatHtmlText+='<li class="aWord"><span class="username">自己:</span><span class="word">'+content+'</span></li>';
+			$(".showContent ul").append('<li class="aWord"><span class="username">自己:</span><span class="word">'+content+'</span></li>');
+			if($(".container ul").height()>$(".container").height()){
+				$(".container").scrollTop($(".container ul").height());
+			}
+
+			socket.emit("userChat", {
+				from: myId,
+				content: content,
+				to: toId
+			});
+		});
+
+
+		//接受消息
+
+		socket.on("userChat", function(data) {
+			console.log("接受消息");
+			var indexPerson=chatUserList.search(data.from);		
+			var nowPerson;
+
+			if(indexPerson<0){
+				nowPerson=new hPerson();
+				nowPerson.username=data.from;
+				chatUserList.push(nowPerson);
+
+				$("#userList").append('<li class="iteUser" uid="'+data.from+'"><span class="iteUserName">何雷</span><span class="unReadNews" style="display:none">0</span></li>');				
+
+			}
+			else{
+				nowPerson=chatUserList.get(indexPerson);
+			}
+			console.log(nowPerson);
+
+			nowPerson.chatHtmlText+='<li class="aWord"><span class="username">'+data.from+':</span><span class="word">'+data.content+'</span></li>';
+
+			//如果当前聊天对象是该用户更新聊天记录
+			if($("#nowUsername").attr("uid")==data.from){
+			$(".container ul").append('<li class="aWord"><span class="username">'+data.from+':</span><span class="word">'+data.content+'</span></li>');
+
+			}
+			else{//设置未读条数
+				nowPerson.count++;
+				var nowLi=$("#userList li[uid='"+data.from+"']").children(".unReadNews");
+				nowLi.html(nowPerson.count);
+				nowLi.css("display","block");
+
+
+			}
+
+		});
+		//用户请求
+		socket.on("addUser",function(data){
+			console.log("用户连接");
+
+			var indexPerson=chatUserList.search(data.username);
+
+			if(indexPerson<0){
+				var temp=new hPerson();
+				temp.username=data.username;
+				chatUserList.push(temp);
+				console.log(chatUserList);
+
+			$("#userList").append('<li class="iteUser" uid="'+data.username+'"><span class="iteUserName">'+data.username+'</span><span class="unReadNews" style="display:none">0</span></li>');
+			};
+
+
+		});
+		//用户下线
+		socket.on("removeUser",function(data){
+
+		});
+
+
+		//绑定点击选择用户列表事件
+		$("#userList").on("click","li.iteUser",function(){
+			var nickname=$(this).children('.iteUserName').html();
+			var username=$(this).attr("uid");
+			$("#nowUsername").html(username);		
+
+			$("#nowUsername").attr("uid",username);
+
+			$(".container ul").html(chatUserList.get(chatUserList.search(username)).chatHtmlText);
+
+			//修改未读记录
+			 chatUserList.get(chatUserList.search(username)).count=0;
+			var nowLi=$("#userList li[uid='"+username+"']").children(".unReadNews");
+			nowLi.html("0");
+			nowLi.css("display","none");			
+
+
+
+
+		});
+
+
+	};
+
+	</script>
+	
+</html>

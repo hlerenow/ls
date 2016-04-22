@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>客服管理</title>
+	<link rel="stylesheet" type="text/css" href="/css/normalize.css"/>
+	<link rel="stylesheet" type="text/css" href="/css/chat.css"/>
+
+	<script src="/js/jquery-1.8.0.min.js"></script>
+	</head>
+	<body>
+		<div class="chatWindow">
+			<div class="showContent ">
+				<div class="container">
+					<ul>									
+					</ul>
+				</div>				
+			</div>
+			<div class="inputWord">
+				<textarea id="word"></textarea>
+			</div>
+			<div class="endBar">
+				<button id="sendNews">发送</button>
+			</div>
+		</div>
+
+	</body>
+	<!-- // <script src="/socket.io/socket.io.js"></script> -->
+	<script src="/js/socket.io.js"></script>
+	<script>
+	window.onload = function() {
+
+		var myId="<%=userName%>";
+		var serverId;
+		// var socket = io.connect('http://115.159.197.251:3000');
+		var socket = io.connect('http://localhost:3000');
+
+
+		socket.emit("check_user",{username:myId});
+		console.log("检查用户");
+		socket.on("connect-server", function(data) {
+			serverId=data.serverId;
+			console.log("connect-serve",serverId);
+		});
+
+		socket.on("noServer",function(data){
+			console.log("noServer");
+			$(".showContent ul").append('<li class="aWord" style="color:red;"><span class="username">系统提示:</span><span class="word">暂无客服在线！！请稍后再试</span></li>');
+
+
+		});
+
+		//发送消息
+		$("#sendNews").on("click", function() {
+			var content = $("#word").val();
+			$("#word").val("");
+
+			$(".showContent ul").append('<li class="aWord"><span class="username">自己:</span><span class="word">'+content+'</span></li>');
+			if($(".container ul").height()>$(".container").height()){
+				$(".container").scrollTop($(".container ul").height());
+			}
+
+
+			if(serverId){
+				console.log(content);
+				socket.emit("userChat", {
+					from: myId,
+					content: content,
+					to: serverId
+				});				
+			}else{
+			$(".showContent ul").append('<li class="aWord" style="color:red;"><span class="username">系统提示:</span><span class="word">暂无客服在线！！请稍后再试</span></li>');				
+			}
+		});
+
+
+		//接受消息
+
+		socket.on("userChat", function(data) {
+			$(".showContent ul").append('<li class="aWord"><span class="username">客服:</span><span class="word">'+data.content+'</span></li>');
+			if($(".container ul").height()>$(".container").height()){
+				$(".container").scrollTop($(".container ul").height());
+			}
+
+		});
+
+	}
+	</script>
+</html>
