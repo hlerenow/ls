@@ -1,7 +1,7 @@
 var express=require('express');
 var app = express();
 var server = require('http').Server(app);
-
+var hostConf=reqiure("./conf/hsotConf");//主机配置
 var bodyParser=require("body-parser");
 
 app.use(bodyParser.json());
@@ -19,10 +19,12 @@ app.use(session({
   saveUninitialized: true
 }))
 
-app.set('port', process.env.PORT || 3000);
+app.set('port', process.env.PORT ||hostConf.port|| 3000);
 app.engine('html', require('ejs').renderFile);
 app.set("view engine", "html");
 app.use(express.static("public"));
+
+//监听端口
 server.listen(app.get("port"),function(){
   console.log('Express server listening on port ' + app.get('port'));	
 });
@@ -70,7 +72,7 @@ app.all("/chat_user",function(req,res){
 
 		}
 
-		res.render("chat_user",{userName:req.session.userName});
+		res.render("chat_user",{userName:req.session.userName,host:hostConf.host,port:hostConf.port});
 		//console.log(socketUsers);
 	}else{
 		res.render("index");
@@ -96,7 +98,7 @@ app.all("/chat_server",function(req,res){
 
 		}
 
-		res.render("chat_server",{userName:req.session.userName});
+		res.render("chat_server",{userName:req.session.userName,host:hostConf.host,port:hostConf.port});
 		//console.log(socketUsers);
 	}else{
 		res.render("index");

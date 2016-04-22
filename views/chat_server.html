@@ -115,8 +115,10 @@ window.onload=function() {
 
 		var myId="<%=userName%>";
 
-		 var socket = io.connect('http://115.159.197.251:3000');
+		 // var socket = io.connect('http://115.159.197.251:3000');
 		//var socket = io.connect('http://localhost:3000');
+		var socket = io.connect('http://<%=host%>:<%=port%>');
+		
 
 
 		var chatUserList=new hPerosonList();
