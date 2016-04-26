@@ -52,6 +52,7 @@
 
 		//发送消息
 		$("#sendNews").on("click", function() {
+
 			var content = $("#word").val();
 			$("#word").val("");
 
@@ -63,6 +64,19 @@
 
 			if(serverId){
 				console.log(content);
+				$.ajax({
+					url: './process/updateLive',
+					type: 'post',
+					data: {update: true}
+				})
+				.done(function() {
+					console.log("success");
+				})
+				.fail(function() {
+					console.log("error");
+				})
+				.always(function (XHR, TS) { XHR = null });
+							
 				socket.emit("userChat", {
 					from: myId,
 					content: content,
