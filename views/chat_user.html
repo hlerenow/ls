@@ -43,6 +43,12 @@
 			console.log("connect-serve",serverId);
 		});
 
+		socket.on("reGetServerId",function(data){
+			serverId=data.id;
+			$(".showContent ul").append('<li class="aWord" style="color:red;"><span class="username">系统提示:</span><span class="word">客服已上线！！！</span></li>');
+
+		});
+
 		socket.on("noServer",function(data){
 			console.log("noServer");
 			$(".showContent ul").append('<li class="aWord" style="color:red;"><span class="username">系统提示:</span><span class="word">暂无客服在线！！请稍后再试</span></li>');
@@ -54,6 +60,7 @@
 		$("#sendNews").on("click", function() {
 
 			var content = $("#word").val();
+
 			$("#word").val("");
 
 			$(".showContent ul").append('<li class="aWord"><span class="username">自己:</span><span class="word">'+content+'</span></li>');
@@ -63,19 +70,19 @@
 
 
 			if(serverId){
-				console.log(content);
-				$.ajax({
-					url: './process/updateLive',
-					type: 'post',
-					data: {update: true}
-				})
-				.done(function() {
-					console.log("success");
-				})
-				.fail(function() {
-					console.log("error");
-				})
-				.always(function (XHR, TS) { XHR = null });
+
+				// $.ajax({
+				// 	url: './process/updateLive',
+				// 	type: 'post',
+				// 	data: {update: true}
+				// })
+				// .done(function() {
+				// 	console.log("success");
+				// })
+				// .fail(function() {
+				// 	console.log("error");
+				// })
+				// .always(function (XHR, TS) { XHR = null });
 							
 				socket.emit("userChat", {
 					from: myId,
@@ -83,6 +90,7 @@
 					to: serverId
 				});				
 			}else{
+
 			$(".showContent ul").append('<li class="aWord" style="color:red;"><span class="username">系统提示:</span><span class="word">暂无客服在线！！请稍后再试</span></li>');				
 			}
 		});
@@ -95,9 +103,59 @@
 			if($(".container ul").height()>$(".container").height()){
 				$(".container").scrollTop($(".container ul").height());
 			}
+			if($(".container ul").height()>$(".container").height()){
+				$(".container").scrollTop($(".container ul").height());
+			}			
 
 		});
 
-	}
+
+		
+		 window.onunload =  function (){   
+
+		  //这里写你的退出之后的事件  
+		//比如调用dwr方法；  
+		//清空session；  
+		//在线统计等功能  
+			//alert("是更新");
+			return true;
+		  } ;
+
+	
+
+	};
+
+
+
+<!--   
+
+		window.onbeforeunload=function(){
+			return "离开页面会造成聊天记录丢失";
+		}
+
+
+       document.onkeydown = function(event) {
+       	var e = event || window.event || arguments.callee.caller.arguments[0];
+       //	alert(e.keyCode);
+
+       	if (e && e.keyCode == 116) { // 按 F5 
+       		//要做的事情
+       		return false;
+       	}
+
+       	if(e.ctrlKey && e.keyCode == 82){
+       		return false;
+       	}
+       	if (e && e.keyCode == 13) { // enter 键
+       		//要做的事情
+       	}
+       };
+
+
+
+
+ 
+
 	</script>
+
 </html>

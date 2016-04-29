@@ -75,20 +75,18 @@ window.onload=function() {
 		};
 		//搜索用户
 		hPerosonList.prototype.search=function(nameStr){
-			console.log("serach",this._hPerosonList.length);
+			console.log("用户个数",this._hPerosonList.length);
 			if(this._hPerosonList.length){
 
 				for(var i in this._hPerosonList){
 
-					console.log("比较",this._hPerosonList[i].username,nameStr);
+					console.log("比较第",i,this._hPerosonList[i].username,nameStr);
 					if( this._hPerosonList[i].username&&this._hPerosonList[i].username==nameStr){
 
 							return i;
 					}
-					else{
-						return -1;
-					}
-				}			
+				}
+				return -1;			
 			}else{
 				return -1;
 			}
@@ -109,6 +107,10 @@ window.onload=function() {
 		//获取单个用户
 		hPerosonList.prototype.get=function(index){
 			return this._hPerosonList[index];
+		};
+
+		hPerosonList.prototype.del=function(index){
+			delete this._hPerosonList[index];
 		};
 
 
@@ -138,17 +140,20 @@ window.onload=function() {
 			var toId=$("#nowUsername").attr("uid");
 			$("#word").val("");
 
-			chatUserList.search(toId).chatHtmlText+='<li class="aWord"><span class="username">自己:</span><span class="word">'+content+'</span></li>';
-			$(".showContent ul").append('<li class="aWord"><span class="username">自己:</span><span class="word">'+content+'</span></li>');
-			if($(".container ul").height()>$(".container").height()){
-				$(".container").scrollTop($(".container ul").height());
-			}
+			if(toId!=""){
+				chatUserList.search(toId).chatHtmlText+='<li class="aWord"><span class="username">自己:</span><span class="word">'+content+'</span></li>';
+				$(".showContent ul").append('<li class="aWord"><span class="username">自己:</span><span class="word">'+content+'</span></li>');
+				if($(".container ul").height()>$(".container").height()){
+					$(".container").scrollTop($(".container ul").height());
+				}
 
-			socket.emit("userChat", {
-				from: myId,
-				content: content,
-				to: toId
-			});
+				socket.emit("userChat", {
+					from: myId,
+					content: content,
+					to: toId
+				});
+				
+			}
 		});
 
 
@@ -156,7 +161,8 @@ window.onload=function() {
 
 		socket.on("userChat", function(data) {
 			console.log("接受消息");
-			var indexPerson=chatUserList.search(data.from);		
+			var indexPerson=chatUserList.search(data.from);	
+			console.log("当前用户下标",indexPerson);	
 			var nowPerson;
 
 			if(indexPerson<0){
@@ -170,7 +176,8 @@ window.onload=function() {
 			else{
 				nowPerson=chatUserList.get(indexPerson);
 			}
-			console.log(nowPerson);
+
+			//console.log(nowPerson);
 
 			nowPerson.chatHtmlText+='<li class="aWord"><span class="username">'+data.from+':</span><span class="word">'+data.content+'</span></li>';
 
@@ -187,6 +194,10 @@ window.onload=function() {
 
 
 			}
+
+			if($(".container ul").height()>$(".container").height()){
+				$(".container").scrollTop($(".container ul").height());
+			}			
 
 		});
 		//用户请求
@@ -208,6 +219,21 @@ window.onload=function() {
 		});
 		//用户下线
 		socket.on("removeUser",function(data){
+			var indexPerson=chatUserList.search(data.username);	
+			if(indexPerson>=0){
+				chatUserList.del(indexPerson);
+				$("#userList li[uid='"+data.username+"']").remove();
+			}
+
+			if(data.username==$("#nowUsername").html()){
+				$("#nowUsername").html("自己");
+				$("#nowUsername").attr("uid","");
+				$(".container ul").html("");		
+				
+			}
+
+
+
 
 		});
 
@@ -235,6 +261,27 @@ window.onload=function() {
 
 
 	};
+
+
+       document.onkeydown = function(event) {
+       	var e = event || window.event || arguments.callee.caller.arguments[0];
+       //	alert(e.keyCode);
+
+       	if (e && e.keyCode == 116) { // 按 F5 
+       		//要做的事情
+       		return false;
+       	}
+
+       	if(e.ctrlKey && e.keyCode == 82){
+       		return false;
+       	}
+       	if (e && e.keyCode == 13) { // enter 键
+       		//要做的事情
+       	}
+       };
+		window.onbeforeunload=function(){
+			return "离开页面会造成聊天记录丢失";
+		}       	
 
 	</script>
 	
