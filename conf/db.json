@@ -1,9 +1,8 @@
 {
   "connectionLimit" : 10,
   "host"            : "localhost",
-  "port":3306,
   "user"            : "root",
   "password"        : "595806119",
   "database" : "ls",
-  "multipleStatements":  true
+  "multipleStatements": true
 }

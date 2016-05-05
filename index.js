@@ -1,28 +1,23 @@
 var express=require('express');
 var app = express();
 var server = require('http').Server(app);
-var hostConf=require("./conf/hostConf");//主机配置
+var hostConf=reqiure("./conf/hsotConf");//主机配置
 var bodyParser=require("body-parser");
-//var debug=require("debug");
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({extend:true}));
 
 var session = require('express-session');
-var cookieParser = require('cookie-parser');
-
 
 var socketUsers={};//在线用户列表用户
 var serverUsers=[];//在线客服列表
-var noServerUserNum=[];//未分配客服的用户数组
+var noServerUserNum=0;
 
 app.use(session({
   secret: 'hlserver',
   resave: false,
-  saveUninitialized: true,
-  name: 'testapp',   //这里的name值得是cookie的name，默认cookie的name是：connect.sid
-  cookie: {}  //设置maxAge是80000ms，即80s后session和相应的cookie失效过期
-}));
+  saveUninitialized: true
+}))
 
 app.set('port', process.env.PORT ||hostConf.port|| 3000);
 app.engine('html', require('ejs').renderFile);
@@ -115,7 +110,6 @@ app.all("/process/login", function(req, res) {
 	pool.query("select uid from huser where username= ? and password= ? ;", [req.body.username, req.body.password], function(err, results) {
 		if (err) {
 			console.log(err);
-			return;
 		}
 		console.log(results);
 		if (results.length != 0) {
@@ -152,15 +146,9 @@ app.all("/process/login", function(req, res) {
 			
 			
 		}else{
-			res.redirect("../../");
+			res.redirect("../index");
 		};
 	});
-
-
-});
-
-//会话关闭
-app.post("/process/loginOut",function(req,res){
 
 });
 
@@ -193,22 +181,15 @@ app.all("/process/visitorLogin", function(req, res) {
 			}
 			else{
 				console.log(err);
-				res.redirect("../../");
+				res.redirect("../");
 			}
 
 		});
 	}else{//用户提交数据为空
-			res.redirect("../../");		
+			res.redirect("../");		
 	}
 
 
-});
-
-
-// 更新会话时间
-app.post('/process/updateLive',function(req,res){
-	console.log('ajax',req.session.userName);
-	res.send();
 });
 
 
@@ -225,13 +206,9 @@ io.on('connection', function(socket) {
 		var tempFlag;
 		
 		if(socketUsers[data.username]){//用户已登录
-
-			var mySockt;//自己创建的k客服数据结构
 			for(var i in serverUsers){
-				if(serverUsers[i].name==data.username){
+				if(serverUsers[i].name==data.username)
 					tempFlag=true;
-					mySockt=serverUsers[i];
-				}
 			}
 
 			if(tempFlag){//判断用户类型
@@ -240,12 +217,9 @@ io.on('connection', function(socket) {
 						serverId: data.username
 					});
 
-					while(noServerUserNum.length){
+					if(noServerUserNum){
 						socket.emit("serverOnline");
-						mySockt.havaUsers++;
-						if(mySockt.havaUsers<=mySockt.maxUsers){
-							socket.to(noServerUserNum.shift()).emit("reGetServerId",{id:data.username});
-						}
+						noServerUserNum--;
 					}
 			}
 			else{
@@ -254,7 +228,7 @@ io.on('connection', function(socket) {
 				if(serverUsers.length<1){//没有客服在线
 					console.log("没有客服在线");
 					socket.emit("noServer");
-					noServerUserNum.push(data.username);
+					noServerUserNum++;
 
 				}
 				else{
@@ -281,7 +255,7 @@ io.on('connection', function(socket) {
 
 
 	socket.on("userChat", function(data) {
-		//console.log(data);
+		console.log(data);
 
 		if(data.to){
 
@@ -291,7 +265,7 @@ io.on('connection', function(socket) {
 					console.log(err);				
 				};
 
-				//console.log(results);
+				console.log(results);
 
 				pool.query("insert into chathistory set `from`=?,`to`=?,content=?;",[results[0][0].uid,results[1][0].uid,data.content],function(err,reuslts){
 
@@ -310,12 +284,19 @@ io.on('connection', function(socket) {
 	});
 
 	//用户断线 or 刷新
-
-
 	socket.on("disconnect",function(){
+		for(var i in serverUsers){
+			if(serverUsers[i].name==socket.name){
+				delete serverUsers[i];
+			}
+
+			if(socketUsers[socket.name]){
+				delete socketUsers[socket.name];
+			}
+		}
 		console.log("断线");
-		socket.broadcast.emit("removeUser",{username:socket.name});
 	});
+
 
 });
 
