@@ -1,80 +1,176 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<meta charset="utf-8" />
-	<title>客服系统</title>
-	<link rel="stylesheet" type="text/css" href="/css/normalize.css"></head>
-	<link rel="stylesheet" href="/css/index.css">
-<body>
-	<div class="index-chooice">
-		<button id="crypto">匿名咨询</button>
-		<button id="loginBtn">登录咨询</button>
-	</div>
-	<div id="login-fomrs">
-		<div id="crytonym">
-			<form action="/process/visitorLogin" method="post">
-				<span>昵称<input type="text" name="nickname" /></span>
-				<span>电子邮箱<input type="text" name="email" /></span>
-				<input type="submit" value="咨询" />
+	<head>
+		<meta charset="utf-8" />
+		<title>访客</title>
+	<link rel="stylesheet" type="text/css" href="/css/normalize.css"/>
+	<link rel="stylesheet" type="text/css" href="/css/chat.css"/>
 
-
-			</form>
+	<script src="/js/jquery-1.8.0.min.js"></script>
+	<script src="/js/GUID.js"></script>
+	</head>
+	<body>
+		<iframe src="http://h-five.com" width="100%" height="100%" frameborder="0"></iframe>
+		<div id="chatWindow" class="chatWindow">
+			<div class="header">
+				<img class="headPhoto" src="http://depot.nipic.com/file/20150605/13378630_23102978350.jpg" />
+				<div class="serverInfo">
+					<div class="serverName">希达</div>
+					<div class="motto">纵有疾风起，人生不言弃.</div>
+				</div>
+				<div class="closeHandle">
+					<span class="closeIcon"></span>
+					<span class="ring"></span>
+				</div>
+			</div>
+			<div class="showContent ">
+				<div class="container">
+					<ul>									
+					</ul>
+				</div>				
+			</div>
+			<div class="footer">
+				<div class="inputWord">
+					<textarea id="word"></textarea>
+				</div>
+				<div class="endBar">
+					<button id="sendNews">发送</button>
+				</div>				
+			</div>
 		</div>
-		<div id="login">
-			<form action="/process/login" method="post">
-				<input type="text" name="username">
-				<input type="password" name="password">
-				<input type="submit" value="登录">
-			</form>
 
-		</div>
-	</div>
-</body>
-<script type="text/javascript">
-	window.onload=function(){
-		function hbind(dom,event,fn){
-			if(dom.addEventListener){
-				dom.addEventListener(event,fn);
+	</body>
+	<!-- // <script src="/socket.io/socket.io.js"></script> -->
+	<script src="/js/socket.io.js"></script>
+	<script>
+	window.onload = function() {
+
+		var chatTempLate={
+			uchat:function(content){
+				return '<li class="aWord uSelf">'+
+							'<div class="wordCotent">'+
+								'<div class="word">'+content+'</div>'+
+							'</div>'+
+						'</li>';
+			},
+			schat:function(from,content){
+				return '<li class="aWord Sothers">'+
+							'<span class="username">'+from+'</span>'+
+							'<div class="wordCotent">'+
+								'<div class="word">'+content+'</div>'+
+							'</div>'+
+						'</li>';
+			},
+			tip:function(str){
+				return '<li class="aWord tipNews" style="color:red;">'+
+							'<span class="username">系统提示:</span>'+
+							'<span class="word">'+str+'</span>'+
+						'</li>';
 			}
-			else{
-				dom.attachEvent("on"+event,fn);
-			};
 		};
 
+		var myId=new GUID().newGUID();//+prompt("请输入你的用户名(不能为空，为空会出错):")
 
-		function hGetStyle(dom,attr){
-			if(window.getComputedStyle){
-				return window.getComputedStyle(dom,null)[attr];
+		var socket = io.connect('<%=host %>:<%=wsPort %>');
+		var serverId='';
+
+		socket.emit("initU",{
+			"role":1,
+			"username":myId,
+			"nickname":myId
+		});
+
+		socket.on('running',function(data){
+			serverId=data.serverId;
+		});
+
+		socket.on("noServer",function(data){
+			//console.log("noServer");
+			$(".showContent ul").append(chatTempLate.tip("暂无客服在线！！请稍后再试"));
+
+			if($(".container ul").height()>$(".container").height()){
+				$(".container").scrollTop($(".container ul").height());
+			}			
+		});
+
+		//发送消息
+		$("#sendNews").on("click", function() {
+			var content = $("#word").val();
+			$("#word").val("");
+
+			$(".showContent ul").append(chatTempLate.uchat(content));
+			if($(".container ul").height()>$(".container").height()){
+				$(".container").scrollTop($(".container ul").height());
 			}
-			else if(dom.currentStyle){
-				return dom.currentStyle[attr];
-			}else return null;
-		};
 
-		hbind(document.getElementById("crypto"),"click",function(){
-			document.getElementById("login").style.display="none";			
-			var nowDisoplay=hGetStyle(document.getElementById("crytonym"),"display");
-			if(nowDisoplay=="none"){
+			if(serverId!=''){			
+				socket.emit("userChat", {
+					from: myId,
+					content: content,
+					to: serverId
+				});
 
-				document.getElementById("crytonym").style.display="block";
+
 			}else{
-				document.getElementById("crytonym").style.display="none";				
+			$(".showContent ul").append(chatTempLate.tip("暂无客服在线！！请稍后再试"));	
+				if($(".container ul").height()>$(".container").height()){
+					$(".container").scrollTop($(".container ul").height());
+				}						
 			}
 		});
 
-		hbind(document.getElementById("loginBtn"),"click",function(){
-			document.getElementById("crytonym").style.display="none";	
 
-			var nowDisoplay=hGetStyle(document.getElementById("login"),"display");
-			if(nowDisoplay=="none"){
+		//接受消息
 
-				document.getElementById("login").style.display="block";
-			}else{
-				document.getElementById("login").style.display="none";				
+		socket.on("userChat", function(data) {
+			//console.log("ok");
+
+			$(".showContent ul").append(chatTempLate.schat(data.from,data.content));
+
+			if($(".container ul").height()>$(".container").height()){
+				$(".container").scrollTop($(".container ul").height());
 			}
-		});		
+
+		});
+
+		socket.on("sendHisroty",function(data){
+			var tempStr="";
+			for(var i=0;i<data.length;i++){
+				if(data[i].from==myId){
+					tempStr+=chatTempLate.uchat(data[i].content);
+
+				}else{
+					tempStr+=chatTempLate.schat(data[i].from,data[i].content);					
+				}
+			}
+			$(".showContent ul").append(tempStr);
+			if($(".container ul").height()>$(".container").height()){
+				$(".container").scrollTop($(".container ul").height());
+			}			
+
+		});
+
+		socket.on("serverOffLine",function(data){
+			//console.log("下线客服",data);
+		});
 
 	}
-	
-</script>
+
+
+	//回车键
+      document.onkeydown=function(event){
+            var e = event || window.event || arguments.callee.caller.arguments[0];
+            if(e && e.keyCode==27){ // 按 Esc 
+                //要做的事情
+              }
+            if(e && e.keyCode==113){ // 按 F2 
+                 //要做的事情
+               }            
+             if(e && e.keyCode==13){ // enter 键
+                 //要做的事情
+				$("#sendNews").trigger("click");
+				return false;
+            }
+        }	
+	</script>
 </html>

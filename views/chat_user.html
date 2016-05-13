@@ -30,29 +30,34 @@
 	<script>
 	window.onload = function() {
 
-		var myId="<%=userName%>";
-		var serverId;
-		// var socket = io.connect('http://115.159.197.251:3000');
-		var socket = io.connect('http://<%=host%>:<%=port%>');
+		var myId="555";
 
+		var socket = io.connect('http://115.159.197.251:7000');
+		var serverid='';
 
-		socket.emit("check_user",{username:myId});
-		console.log("检查用户");
-		socket.on("connect-server", function(data) {
-			serverId=data.serverId;
-			console.log("connect-serve",serverId);
+		socket.on('noerver',function(){
+			alert("客服不在线");
+		});
+
+		socket.emit("initU",{
+			"role":"访客",
+			"username":"hl",
+			"nickname":"程画",
+			"type":"1"
+		});
+
+		socket.on('running',function(data){
+			serverid=data.serverId;
 		});
 
 		socket.on("noServer",function(data){
 			console.log("noServer");
 			$(".showContent ul").append('<li class="aWord" style="color:red;"><span class="username">系统提示:</span><span class="word">暂无客服在线！！请稍后再试</span></li>');
-
-
 		});
 
 		//发送消息
+			console.log("hello");
 		$("#sendNews").on("click", function() {
-
 			var content = $("#word").val();
 			$("#word").val("");
 
@@ -61,27 +66,15 @@
 				$(".container").scrollTop($(".container ul").height());
 			}
 
-
-			if(serverId){
-				console.log(content);
-				$.ajax({
-					url: './process/updateLive',
-					type: 'post',
-					data: {update: true}
-				})
-				.done(function() {
-					console.log("success");
-				})
-				.fail(function() {
-					console.log("error");
-				})
-				.always(function (XHR, TS) { XHR = null });
-							
+			alert("fasong");
+			if(serverId!=''){			
 				socket.emit("userChat", {
 					from: myId,
 					content: content,
 					to: serverId
-				});				
+				});
+
+
 			}else{
 			$(".showContent ul").append('<li class="aWord" style="color:red;"><span class="username">系统提示:</span><span class="word">暂无客服在线！！请稍后再试</span></li>');				
 			}

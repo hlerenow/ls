@@ -3,9 +3,7 @@ html,body{
 	height: 100%;
 }
 
-*{
-	outline: 1px solid gray;
-}
+
 
 .chatWindow{
 	width: 100%;
@@ -19,13 +17,19 @@ html,body{
 	padding: 5px 10px;
 	/*border: 1px solid gray;*/
 	box-sizing:border-box;
+	border: 1px gray solid;
+
+}
+
+#nowUsername{
+	color: red;
 }
 
 .showContent{
 	width: 100%;
 	height: 70%;
 	min-height: 300px;
-	background-color: pink;
+	background-color: rgb(232, 153, 126);
 	box-sizing:border-box;
 	padding: 10px;
 }
@@ -57,7 +61,7 @@ html,body{
 	width: 100%;
 	height: 15%;
 	min-height: 100px;
-	background-color: pink;
+	background-color: #727374;
 	padding:  10px 10px 15px 10px;
 }
 
@@ -72,7 +76,7 @@ html,body{
 .endBar{
 	width: 100%;
 	height: 10%;
-	background-color: green;
+	background-color: #1A1B1A;
 	min-height: 30px;
 }
 
@@ -110,6 +114,7 @@ html,body{
 	overflow: auto;
 	margin: 0;
 	box-sizing:border-box;
+	border: 1px gray solid;
 
 }
 
@@ -118,6 +123,7 @@ html,body{
 	/*border: 1px solid  gray;*/
 	padding: 3px 5px;
 	position: relative;
+	border: 1px pink solid;
 }
 #userList li .unReadNews{
 	background-color: red;

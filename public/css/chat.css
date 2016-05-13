@@ -1,78 +1,169 @@
 html,body{
+	margin:0;
+	padding: 0;
 	width: 100%;
 	height: 100%;
+	overflow: hidden;
 }
 
-.chatWindow{
-	width: 100%;
-	height: 100%;
-	background: #E5E9EB;
+#chatWindow{
+	box-shadow: 0px 0px 20px 2px #D0D0D0;
+	position: absolute;
+	z-index: 99;
+	right: 20px;
+	bottom: 0;
+	width: 320px;
+	height:500px;
+	font-size: 14px;
+	font-family: "Helvetica Neue",Helvetica,Arial,"Hiragino Sans GB","Microsoft YaHei",sans-serif;
 }
 
+#chatWindow div{
+	box-sizing:border-box;
+}
+
+/*客服头像*/
+
+.header{
+	overflow: hidden;
+	height: 60px;
+	padding: 5px;
+	background-color: #00a6f2;	
+}
+.closeHandle,.headPhoto,.serverInfo{
+	float: left;
+}
+
+.headPhoto{
+	width: 40px;
+	height: 40px;
+	border-radius: 20px;
+	margin:5px;
+}
+
+.serverInfo{
+	margin:0px;
+	color: white;
+	width: 215px;
+}
+
+.serverInfo .serverName,.serverInfo .motto{
+	margin:3px;
+}
+
+.closeHandle .ring,.closeHandle .closeIcon{
+	float: right;
+}
+
+.closeHandle .ring{
+	background-image: url(https://static.meiqia.com/dist/images/icon-desktop.png?v=u34u8a2zteecow29);
+	background-position: -22px -111px;
+	background-repeat: no-repeat;
+	background-size: 44px;
+	box-sizing: border-box;
+	color: rgb(255, 255, 255);
+	width: 22px;
+	height: 22px;	
+	display: block;	
+}
+
+.closeHandle .closeIcon{
+	background-image: url(https://static.meiqia.com/dist/images/icon-desktop.png?v=u34u8a2zteecow29);
+	background-position: -22px -66px;
+	background-repeat: no-repeat;
+	background-size: 44px;
+	box-sizing: border-box;	
+	width: 22px;
+	height: 22px;	
+	display: block;		
+}
+
+/*消息展示*/
 .showContent{
 	width: 100%;
-	height: 70%;
-	min-height: 300px;
-	background-color: pink;
-	box-sizing:border-box;
-	padding: 10px;
+	height: 310px;
+	background-color: white;
+	overflow: hidden;
 }
-
-.container{
+.showContent .container{
 	width: 100%;
 	height: 100%;
-	background-color: white;
+	overflow-y:auto;
+}
+
+.showContent ul{
+	list-style: none;
+	padding: 10px;
+	margin:0px;
+}
+.showContent ul li{
+    margin: 5px 0px 10px;
+}
+.showContent .username{
+	line-height: 1.8;
+}
+
+.wordCotent{
 	overflow: auto;
 }
-.showContent ul{
-	background-color: white;
-	margin: 0;
-	padding: 0;
-	list-style: none;
-	width: 100%;
-	min-height: 100%;
+
+.uSelf .word{
+	margin-left:20px;
+	border: 1px #E0DEDE solid;
+    border-radius: 3px;
+    padding: 5px;
+    float: right;
+	max-width: 100%;
+    word-wrap: break-word;
+}
+
+.Sothers .word{
+	margin-right: 10px;
+	border: 1px #E0DEDE solid;
+    border-radius: 3px;
+    padding: 5px;
+ 	max-width: 100%;
+    word-wrap: break-word;
+    float: left;
+}
+
+.showContent ul .tipNews{
+	text-align: center;
 
 }
 
-.aWord{
-	margin-bottom: 10px;
-}
-
-
-
+/*输入框*/
 .inputWord{
-	box-sizing:border-box;
-	width: 100%;
-	height: 20%;
-	min-height: 100px;
-	background-color: pink;
-	padding:  10px 10px 15px 10px;
+    width: 100%;
+    height: 80px;
+    background: white;
 }
 
 .inputWord #word{
-	width: 100%;
-	height: 100%;
-	max-width: 100%;
-	max-height: 100%;
-	resize:none;
+	box-sizing: border-box;
+    width: 100%;
+    resize: none;
+    border-left: none;
+    border-right: none;
+    border-color: rgba(234, 234, 234, 0.86);
+    height: 100%;
+    outline: none;
+    padding: 5px;
 }
 
-.endBar{
+.footer .endBar{
+	height: 57px;
 	width: 100%;
-	height: 10%;
-	background-color: green;
-	min-height: 30px;
+	background-color: white;
 }
 
 #sendNews{
-	cursor: pointer;
+	border: none;
+    background-color: #00A6F2;
     color: white;
-    border: none;
+    padding: 5px 10px;
+    border-radius: 3px;
+    margin: 10px 5px;
     float: right;
-    background-color: #05444D;
-    width: 100px;
-    padding: 5px;
-    border-radius: 5px;
-    margin-top: 30px;
-    margin-right: 10px;
+    cursor: pointer;
 }
