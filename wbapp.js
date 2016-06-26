@@ -7,7 +7,6 @@ var serverModeList = require('./socketChatMod/serverModeList');
 
 
 var io = require('socket.io')();
-var socketModel = require("./socketChatMod/index.js");
 
 // {
 // 	"username":"",
@@ -43,6 +42,7 @@ io.on('connection', function(socket){
 
 		socket.role=1;
 
+//        检验用户是否只是刷新
 		var tempU=myUL.getByU(data.username);//索引值
 		if (tempU) {
 		
@@ -55,13 +55,20 @@ io.on('connection', function(socket){
 
 			socket.emit("sendHisroty",tempU.chatHistory);
 
-		} else {//没有客服在线时 ，不将访客记录在内存
+		} else {
+		//没有客服在线时 ，不将访客记录在内存
 			var serverUserName = "";
 			if (mySL.len()) { //有客服存在
-				console.log("ok");
+				console.log("有客服在线");
 				serverUserName = mySL.getUByMinUsers();
 
 				if (serverUserName != null) { //分配客服
+
+                    data.nickname="访客"+mySL.getByU(serverUserName).onlyName++;
+                    mySL.onlyName++;
+
+                    // socket.emit("nickNme",{nickName:data.nicekname});
+
 					var temp = new userMode({
 						"username": data.username,
 						"nickname": data.nickname,
@@ -164,6 +171,7 @@ io.on('connection', function(socket){
 					console.log("客服离开页面",socket.name);
 
 					tempU.selfDestory(io, myUL, mySL);
+                    io.emit("removeUser",socket.name);
 				}, 1000 * 10, tempU);
 
 			}
@@ -174,7 +182,8 @@ io.on('connection', function(socket){
 				tempU.selfDestoryHandle = setTimeout(function(tempU) {
 					console.log("访客离开页面",socket.name);
 					tempU.selfDestory(io, myUL, mySL);
-				}, 1000 * 10, tempU);
+                    io.emit("removeUser",socket.name);
+                }, 1000 * 10, tempU);
 
 			};
 		};

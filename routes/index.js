@@ -9,9 +9,13 @@ router.get('/', function(req, res, next) {
   res.render('index', { wsPort: conf.wsPort,host:conf.host });
 });
 
-router.get('/chat_server.html',function(req,res,next){
-	res.render('chat_server',{ wsPort: conf.wsPort,host:conf.host });
+router.get('/serve',function(req,res,next){
+	res.render('serve',{ wsPort: conf.wsPort,host:conf.host });
 });
 
-
+router.get('/serve1',function(req,res,next){
+    res.render('chat_server',{ wsPort: conf.wsPort,host:conf.host });
+});
 module.exports = router;
+
+
